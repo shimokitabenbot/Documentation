@@ -14,7 +14,57 @@
 
 ## 機能詳細
 ### ツイート
-- (作成中)
+#### URI
+/tweet
+
+#### HTTPリクエスト
+##### リクエストメソッド
+POST
+
+##### リクエストヘッダ
+- なし
+
+##### リクエストボディ
+- なし
+
+#### HTTPレスポンス
+##### HTTPステータスコード
+| ステータスコード | 説明             |
+|:----|:-----------|
+| 201 | 正常終了 |
+| 500 | サーバ内部エラー |
+
+##### レスポンスヘッダ
+```
+ Content-Type: application/json;charset=UTF-8
+```
+
+##### レスポンスボディ
+###### 正常終了
+```
+ { “tweet” : "[単語]: 単語\n[意味]: 意味\n[例文]: 例文\n(訳文)\n#下北弁", "twittered_at" : "ツイートした日時" }
+```
+
+例   
+```
+ { “tweet” : "[単語]: わい\n[意味]: 私。僕。俺。\n[例文]: わいがモテないのはどう考えてもおめどが悪い。\n(私がモテないのはどう考えてもお前らが悪い。)\n#下北弁", "twittered_at" : "2014-01-31T10:00:00,555Z" }
+```
+
+
+###### 異常終了
+[エラー情報]の[フォーマット]を参照。
+
+下表に、エラー別のエラー情報を記載する。
+
+| エラー内容 | エラーコード | エラーメッセージ | エラー詳細 |
+|:----------:|:-----------:|:------------:|:------------:|
+| Twitterにアクセスできない | 52000001 | access_unabled | なし |
+| ツイート失敗 | 53000001 | twitter_failed | ツイートした文章 |
+
+例 : リクエストボディが空  
+```
+{“error” : { “code” : “52000001”, “message” : “access_unabled”, “detail” : “” }}
+```
 
 ### 単語登録
 #### URI
@@ -35,7 +85,8 @@ POST
 {
   “word” : “単語”,
   “description” : “単語の意味”,
-  “example” : “単語の例文”
+  “example” : “単語の例文”,
+  "translate" : "単語の訳文"
 }
 ```
 
@@ -87,12 +138,12 @@ POST
 
 例 : リクエストボディが空  
 ```
-“error” : { “code” : “11000001”, “message” : “empty_body”, “detail” : “” }
+  {“error” : { “code” : “11000001”, “message” : “empty_body”, “detail” : “” }}
 ```
 
 例：入力値文字数超過(wordカラムが20文字)
 ```
-“error” : { “code” : “11000003”, “message” : “value_exceeded”, “detail” : “Word is too long” }
+  {“error” : { “code” : “11000003”, “message” : “value_exceeded”, “detail” : “Word is too long” }}
 ```
 
 ### 単語更新
@@ -101,16 +152,7 @@ POST
 
 ### 単語検索
 #### URI
-/word?q="単語"&match_type="(complete | part)"
-
-q
-
-- 単語。指定なしの場合は全件検索。
-
-match_type  
-
-- complete : 完全一致。指定なしでも可。
-- part : 部分一致。部分一致の場合は指定必須。
+/word
 
 #### HTTPリクエスト
 ##### リクエストメソッド
@@ -119,12 +161,20 @@ GET
 ##### リクエストヘッダ
 
 ```
- Content-Type: application/x-www-form-urlencoded
+ Content-Type: application/json
 ```
 
 
 ##### リクエストボディ
-なし
+```
+  { "word" : "検索する単語", "match_type" : "検索条件" }
+```
+
+match_type  
+
+- complete : 完全一致。指定なしでも可。
+- part : 部分一致。部分一致の場合は指定必須。
+
 
 #### HTTPレスポンス
 ##### HTTPステータスコード
@@ -182,7 +232,7 @@ JSON配列形式で返す。
 
 例 : 検索条件が間違っている(存在しない検索条件:aaa)  
 ```
-“error” : { “code” : “11000003”, “message” : “match_type_incorrect”, “detail” : “aaa” }
+ {“error” : { “code” : “11000003”, “message” : “match_type_incorrect”, “detail” : “aaa” }}
 ```
 
 ### 単語削除
@@ -217,9 +267,9 @@ JSON配列形式で返す。
 ### フォーマット
 
 ```
-“error” : {
+{“error” : {
   “code” : “エラーコード”,
   “message” : “エラーメッセージ”,
   “detail” : “エラー詳細”
-}
+}}
 ```
